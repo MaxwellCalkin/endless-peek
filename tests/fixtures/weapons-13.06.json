@@ -1,0 +1,646 @@
+{
+ "source": "https://valorant-api.com/v1/weapons (game build release-13.06), fetched 2026-10-07",
+ "weapons": {
+  "odin": {
+   "fireRate": 12,
+   "magazineSize": 100,
+   "runSpeedMultiplier": 0.76,
+   "equipTimeSeconds": 1.25,
+   "reloadTimeSeconds": 5,
+   "firstBulletAccuracy": 0.8,
+   "shotgunPelletCount": 1,
+   "fireMode": null,
+   "altFireType": "EWeaponAltFireDisplayType::ADS",
+   "ads": {
+    "zoomMultiplier": 1.15,
+    "fireRate": 15.6,
+    "runSpeedMultiplier": 0.76,
+    "burstCount": 1,
+    "firstBulletAccuracy": 0.79
+   },
+   "altShotgun": null,
+   "damageRanges": [
+    [
+     0,
+     30,
+     95,
+     38,
+     32.3
+    ],
+    [
+     30,
+     50,
+     77.5,
+     31,
+     26.35
+    ]
+   ]
+  },
+  "ares": {
+   "fireRate": 13,
+   "magazineSize": 50,
+   "runSpeedMultiplier": 0.76,
+   "equipTimeSeconds": 1.25,
+   "reloadTimeSeconds": 3.25,
+   "firstBulletAccuracy": 1,
+   "shotgunPelletCount": 1,
+   "fireMode": null,
+   "altFireType": "EWeaponAltFireDisplayType::ADS",
+   "ads": {
+    "zoomMultiplier": 1.15,
+    "fireRate": 13,
+    "runSpeedMultiplier": 0.76,
+    "burstCount": 1,
+    "firstBulletAccuracy": 0.9
+   },
+   "altShotgun": null,
+   "damageRanges": [
+    [
+     0,
+     30,
+     75,
+     30,
+     25.5
+    ],
+    [
+     30,
+     50,
+     70,
+     28,
+     23.800001
+    ]
+   ]
+  },
+  "vandal": {
+   "fireRate": 9.75,
+   "magazineSize": 25,
+   "runSpeedMultiplier": 0.8,
+   "equipTimeSeconds": 1,
+   "reloadTimeSeconds": 2.5,
+   "firstBulletAccuracy": 0.25,
+   "shotgunPelletCount": 1,
+   "fireMode": null,
+   "altFireType": "EWeaponAltFireDisplayType::ADS",
+   "ads": {
+    "zoomMultiplier": 1.25,
+    "fireRate": 8.775,
+    "runSpeedMultiplier": 0.76,
+    "burstCount": 1,
+    "firstBulletAccuracy": 0.1575
+   },
+   "altShotgun": null,
+   "damageRanges": [
+    [
+     0,
+     50,
+     160,
+     40,
+     34
+    ]
+   ]
+  },
+  "warden": {
+   "fireRate": 6.5,
+   "magazineSize": 18,
+   "runSpeedMultiplier": 0.8,
+   "equipTimeSeconds": 1,
+   "reloadTimeSeconds": 2.5,
+   "firstBulletAccuracy": 0.15,
+   "shotgunPelletCount": 1,
+   "fireMode": null,
+   "altFireType": "EWeaponAltFireDisplayType::ADS",
+   "ads": {
+    "zoomMultiplier": 2,
+    "fireRate": 6.5,
+    "runSpeedMultiplier": 0.76,
+    "burstCount": 1,
+    "firstBulletAccuracy": 0.04
+   },
+   "altShotgun": null,
+   "damageRanges": [
+    [
+     0,
+     50,
+     200,
+     50,
+     42
+    ]
+   ]
+  },
+  "bulldog": {
+   "fireRate": 10,
+   "magazineSize": 24,
+   "runSpeedMultiplier": 0.8,
+   "equipTimeSeconds": 1,
+   "reloadTimeSeconds": 2.5,
+   "firstBulletAccuracy": 0.3,
+   "shotgunPelletCount": 1,
+   "fireMode": null,
+   "altFireType": "EWeaponAltFireDisplayType::ADS",
+   "ads": {
+    "zoomMultiplier": 1.25,
+    "fireRate": 6.315715,
+    "runSpeedMultiplier": 0.76,
+    "burstCount": 3,
+    "firstBulletAccuracy": 0.3
+   },
+   "altShotgun": null,
+   "damageRanges": [
+    [
+     0,
+     50,
+     115.5,
+     35,
+     29.75
+    ]
+   ]
+  },
+  "phantom": {
+   "fireRate": 11,
+   "magazineSize": 30,
+   "runSpeedMultiplier": 0.8,
+   "equipTimeSeconds": 1,
+   "reloadTimeSeconds": 2.5,
+   "firstBulletAccuracy": 0.2,
+   "shotgunPelletCount": 1,
+   "fireMode": null,
+   "altFireType": "EWeaponAltFireDisplayType::ADS",
+   "ads": {
+    "zoomMultiplier": 1.25,
+    "fireRate": 9.9,
+    "runSpeedMultiplier": 0.76,
+    "burstCount": 1,
+    "firstBulletAccuracy": 0.11000001
+   },
+   "altShotgun": null,
+   "damageRanges": [
+    [
+     0,
+     20,
+     156,
+     39,
+     33.15
+    ],
+    [
+     20,
+     50,
+     140,
+     35,
+     29.75
+    ]
+   ]
+  },
+  "judge": {
+   "fireRate": 3.5,
+   "magazineSize": 5,
+   "runSpeedMultiplier": 0.75,
+   "equipTimeSeconds": 1,
+   "reloadTimeSeconds": 2.2,
+   "firstBulletAccuracy": 2.5,
+   "shotgunPelletCount": 12,
+   "fireMode": null,
+   "altFireType": null,
+   "ads": null,
+   "altShotgun": null,
+   "damageRanges": [
+    [
+     0,
+     10,
+     34,
+     17,
+     14.450001
+    ],
+    [
+     10,
+     15,
+     20,
+     10,
+     8.5
+    ],
+    [
+     15,
+     50,
+     14,
+     7,
+     5.9500003
+    ]
+   ]
+  },
+  "bucky": {
+   "fireRate": 1.1,
+   "magazineSize": 5,
+   "runSpeedMultiplier": 0.75,
+   "equipTimeSeconds": 1,
+   "reloadTimeSeconds": 2.5,
+   "firstBulletAccuracy": 3,
+   "shotgunPelletCount": 15,
+   "fireMode": "EWeaponFireModeDisplayType::SemiAutomatic",
+   "altFireType": "EWeaponAltFireDisplayType::AirBurst",
+   "ads": null,
+   "altShotgun": null,
+   "damageRanges": [
+    [
+     0,
+     8,
+     34,
+     17,
+     14
+    ],
+    [
+     8,
+     12,
+     26,
+     13,
+     11.05
+    ],
+    [
+     12,
+     50,
+     18,
+     9,
+     7.65
+    ]
+   ]
+  },
+  "frenzy": {
+   "fireRate": 10,
+   "magazineSize": 15,
+   "runSpeedMultiplier": 0.85,
+   "equipTimeSeconds": 1,
+   "reloadTimeSeconds": 1.5,
+   "firstBulletAccuracy": 0.65,
+   "shotgunPelletCount": 1,
+   "fireMode": null,
+   "altFireType": null,
+   "ads": null,
+   "altShotgun": null,
+   "damageRanges": [
+    [
+     0,
+     20,
+     78,
+     26,
+     22.1
+    ],
+    [
+     20,
+     50,
+     63,
+     21,
+     17.85
+    ]
+   ]
+  },
+  "classic": {
+   "fireRate": 6.75,
+   "magazineSize": 12,
+   "runSpeedMultiplier": 0.85,
+   "equipTimeSeconds": 0.75,
+   "reloadTimeSeconds": 1.75,
+   "firstBulletAccuracy": 0.4,
+   "shotgunPelletCount": 1,
+   "fireMode": "EWeaponFireModeDisplayType::SemiAutomatic",
+   "altFireType": "EWeaponAltFireDisplayType::Shotgun",
+   "ads": null,
+   "altShotgun": {
+    "shotgunPelletCount": 3,
+    "burstRate": 2.22
+   },
+   "damageRanges": [
+    [
+     0,
+     30,
+     78,
+     26,
+     22.1
+    ],
+    [
+     30,
+     50,
+     66,
+     22,
+     18.7
+    ]
+   ]
+  },
+  "bandit": {
+   "fireRate": 5.1,
+   "magazineSize": 8,
+   "runSpeedMultiplier": 0.85,
+   "equipTimeSeconds": 0.75,
+   "reloadTimeSeconds": 1.5,
+   "firstBulletAccuracy": 0.275,
+   "shotgunPelletCount": -1,
+   "fireMode": "EWeaponFireModeDisplayType::SemiAutomatic",
+   "altFireType": null,
+   "ads": null,
+   "altShotgun": null,
+   "damageRanges": [
+    [
+     0,
+     10,
+     152,
+     39,
+     33
+    ],
+    [
+     10,
+     30,
+     128,
+     39,
+     33
+    ],
+    [
+     30,
+     50,
+     112,
+     34,
+     28
+    ]
+   ]
+  },
+  "ghost": {
+   "fireRate": 6.75,
+   "magazineSize": 13,
+   "runSpeedMultiplier": 0.85,
+   "equipTimeSeconds": 0.75,
+   "reloadTimeSeconds": 1.5,
+   "firstBulletAccuracy": 0.3,
+   "shotgunPelletCount": 1,
+   "fireMode": "EWeaponFireModeDisplayType::SemiAutomatic",
+   "altFireType": null,
+   "ads": null,
+   "altShotgun": null,
+   "damageRanges": [
+    [
+     0,
+     30,
+     105,
+     30,
+     25.5
+    ],
+    [
+     30,
+     50,
+     87.5,
+     25,
+     21.25
+    ]
+   ]
+  },
+  "sheriff": {
+   "fireRate": 4,
+   "magazineSize": 6,
+   "runSpeedMultiplier": 0.8,
+   "equipTimeSeconds": 1,
+   "reloadTimeSeconds": 2.25,
+   "firstBulletAccuracy": 0.25,
+   "shotgunPelletCount": 1,
+   "fireMode": "EWeaponFireModeDisplayType::SemiAutomatic",
+   "altFireType": null,
+   "ads": null,
+   "altShotgun": null,
+   "damageRanges": [
+    [
+     0,
+     30,
+     159.5,
+     55,
+     46.75
+    ],
+    [
+     30,
+     50,
+     145,
+     50,
+     42.5
+    ]
+   ]
+  },
+  "shorty": {
+   "fireRate": 3,
+   "magazineSize": 2,
+   "runSpeedMultiplier": 0.8,
+   "equipTimeSeconds": 0.75,
+   "reloadTimeSeconds": 1.75,
+   "firstBulletAccuracy": 4,
+   "shotgunPelletCount": 15,
+   "fireMode": "EWeaponFireModeDisplayType::SemiAutomatic",
+   "altFireType": null,
+   "ads": null,
+   "altShotgun": null,
+   "damageRanges": [
+    [
+     0,
+     7,
+     22,
+     11,
+     9.35
+    ],
+    [
+     7,
+     15,
+     12,
+     6,
+     5.1
+    ],
+    [
+     15,
+     50,
+     6,
+     3,
+     2.5500002
+    ]
+   ]
+  },
+  "operator": {
+   "fireRate": 0.6,
+   "magazineSize": 5,
+   "runSpeedMultiplier": 0.76,
+   "equipTimeSeconds": 1.5,
+   "reloadTimeSeconds": 3.7,
+   "firstBulletAccuracy": 5,
+   "shotgunPelletCount": 1,
+   "fireMode": "EWeaponFireModeDisplayType::SemiAutomatic",
+   "altFireType": "EWeaponAltFireDisplayType::ADS",
+   "ads": {
+    "zoomMultiplier": 2.5,
+    "fireRate": 0.6,
+    "runSpeedMultiplier": 0.72,
+    "burstCount": 1,
+    "firstBulletAccuracy": -1
+   },
+   "altShotgun": null,
+   "damageRanges": [
+    [
+     0,
+     50,
+     255,
+     150,
+     120
+    ]
+   ]
+  },
+  "guardian": {
+   "fireRate": 5.25,
+   "magazineSize": 12,
+   "runSpeedMultiplier": 0.8,
+   "equipTimeSeconds": 1,
+   "reloadTimeSeconds": 2.5,
+   "firstBulletAccuracy": 0.1,
+   "shotgunPelletCount": 1,
+   "fireMode": "EWeaponFireModeDisplayType::SemiAutomatic",
+   "altFireType": "EWeaponAltFireDisplayType::ADS",
+   "ads": {
+    "zoomMultiplier": 1.5,
+    "fireRate": 5.25,
+    "runSpeedMultiplier": 0.76,
+    "burstCount": 1,
+    "firstBulletAccuracy": -1
+   },
+   "altShotgun": null,
+   "damageRanges": [
+    [
+     0,
+     50,
+     195,
+     65,
+     48.75
+    ]
+   ]
+  },
+  "outlaw": {
+   "fireRate": 2.75,
+   "magazineSize": 2,
+   "runSpeedMultiplier": 0.8,
+   "equipTimeSeconds": 1.25,
+   "reloadTimeSeconds": 3.8,
+   "firstBulletAccuracy": 3.5,
+   "shotgunPelletCount": -1,
+   "fireMode": "EWeaponFireModeDisplayType::SemiAutomatic",
+   "altFireType": "EWeaponAltFireDisplayType::ADS",
+   "ads": {
+    "zoomMultiplier": 3.5,
+    "fireRate": 2.75,
+    "runSpeedMultiplier": 0.8,
+    "burstCount": -1,
+    "firstBulletAccuracy": -1
+   },
+   "altShotgun": null,
+   "damageRanges": [
+    [
+     0,
+     50,
+     238,
+     140,
+     119
+    ]
+   ]
+  },
+  "marshal": {
+   "fireRate": 1.5,
+   "magazineSize": 5,
+   "runSpeedMultiplier": 0.8,
+   "equipTimeSeconds": 1.25,
+   "reloadTimeSeconds": 2.5,
+   "firstBulletAccuracy": 1,
+   "shotgunPelletCount": 1,
+   "fireMode": "EWeaponFireModeDisplayType::SemiAutomatic",
+   "altFireType": "EWeaponAltFireDisplayType::ADS",
+   "ads": {
+    "zoomMultiplier": 3.5,
+    "fireRate": 1.2,
+    "runSpeedMultiplier": 0.9,
+    "burstCount": 1,
+    "firstBulletAccuracy": -1
+   },
+   "altShotgun": null,
+   "damageRanges": [
+    [
+     0,
+     50,
+     202,
+     101,
+     85.850006
+    ]
+   ]
+  },
+  "spectre": {
+   "fireRate": 13.333,
+   "magazineSize": 30,
+   "runSpeedMultiplier": 0.85,
+   "equipTimeSeconds": 0.75,
+   "reloadTimeSeconds": 2.25,
+   "firstBulletAccuracy": 0.4,
+   "shotgunPelletCount": 1,
+   "fireMode": null,
+   "altFireType": "EWeaponAltFireDisplayType::ADS",
+   "ads": {
+    "zoomMultiplier": 1.15,
+    "fireRate": 11.9997,
+    "runSpeedMultiplier": 0.76,
+    "burstCount": 1,
+    "firstBulletAccuracy": 0.25
+   },
+   "altShotgun": null,
+   "damageRanges": [
+    [
+     0,
+     15,
+     78,
+     26,
+     22.1
+    ],
+    [
+     15,
+     30,
+     66,
+     22,
+     18.7
+    ],
+    [
+     30,
+     50,
+     60,
+     20,
+     17
+    ]
+   ]
+  },
+  "stinger": {
+   "fireRate": 16,
+   "magazineSize": 20,
+   "runSpeedMultiplier": 0.85,
+   "equipTimeSeconds": 0.75,
+   "reloadTimeSeconds": 2.25,
+   "firstBulletAccuracy": 0.65,
+   "shotgunPelletCount": 1,
+   "fireMode": null,
+   "altFireType": "EWeaponAltFireDisplayType::ADS",
+   "ads": {
+    "zoomMultiplier": 1.15,
+    "fireRate": 8.470589,
+    "runSpeedMultiplier": 0.76,
+    "burstCount": 4,
+    "firstBulletAccuracy": 0.35
+   },
+   "altShotgun": null,
+   "damageRanges": [
+    [
+     0,
+     15,
+     67.5,
+     27,
+     22.95
+    ],
+    [
+     15,
+     50,
+     57,
+     23,
+     19
+    ]
+   ]
+  }
+ }
+}
