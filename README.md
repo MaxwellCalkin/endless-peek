@@ -134,7 +134,7 @@ npm run check      # all of the above
 1. In the repository settings, open **Pages** and set **Source** to **GitHub Actions**.
 2. Push to `main`, or run the **Deploy to GitHub Pages** workflow by hand.
 
-The build uses relative paths, so it works from any sub-path.
+The game is then live at https://maxwellcalkin.github.io/endless-peek/. The build uses relative paths, so it works from any sub-path.
 
 ## Legal
 
