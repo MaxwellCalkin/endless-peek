@@ -105,7 +105,7 @@ class PlanBuilder {
     this.wall(uc + width / 2, hw, v0, v0 + T);
   }
 
-  build(kind: SegmentKind, entryWidth: number, exit: SegmentPlan['exit']): SegmentPlan {
+  build(kind: SegmentKind, entryWidth: number, exit: SegmentPlan['exit'], path: { u: number; v: number }[]): SegmentPlan {
     return {
       kind,
       wallHeight: this.height,
@@ -114,8 +114,20 @@ class PlanBuilder {
       spots: this.spots,
       footprint: this.footprint,
       exit,
+      path,
     };
   }
+}
+
+/**
+ * Walking line for straight-walled segments: down the middle (clear of wall-side cover),
+ * through any `via` points, then out of the exit port.
+ */
+function walkPath(exit: SegmentPlan['exit'], length: number, via: { u: number; v: number }[] = [], start = 0.6): { u: number; v: number }[] {
+  const pts = [{ u: 0, v: start }, ...via];
+  if (exit.turn === 0) pts.push({ u: 0, v: Math.max(start, length - 2.6) }, { u: exit.u, v: exit.v - 1 }, { u: exit.u, v: exit.v });
+  else pts.push({ u: 0, v: exit.v }, { u: exit.u, v: exit.v });
+  return pts;
 }
 
 /** Shared exit construction for straight-walled segments (corridor, zigzag, pillar hall). */
@@ -157,7 +169,7 @@ export function buildSpawn(ctx: BuildContext): SegmentPlan {
   // A little cover so the first sightline isn't completely open.
   b.solid(-hw, -hw + 0.9, 6, 7.2, 0, 1.0, 'crate');
   const exit = corridorExit(b, ctx.rng, hw, length, 0, { left: [], right: [] }, 0.5);
-  const plan = b.build('spawn', 0, exit);
+  const plan = b.build('spawn', 0, exit, walkPath(exit, length, [], 1.2));
   plan.spawn = { u: 0, v: 1.2 };
   return plan;
 }
@@ -232,7 +244,7 @@ export function buildCorridor(ctx: BuildContext): SegmentPlan {
 
   sideWalls(b, hw, end, turn, length, gaps);
   addFarSpots(b, hw, length, exit);
-  return b.build('corridor', entryWidth, exit);
+  return b.build('corridor', entryWidth, exit, walkPath(exit, length));
 }
 
 function sideWalls(
@@ -456,7 +468,7 @@ export function buildRoom(ctx: BuildContext): SegmentPlan {
     if (l > -hw + 0.5) b.spot(l, vFar - 0.45, 0, vNear, 'exit');
     if (r < hw - 0.5) b.spot(r, vFar - 0.45, 0, vNear, 'exit');
   }
-  return b.build('room', entryWidth, exit);
+  return b.build('room', entryWidth, exit, [{ u: 0, v: 0.6 }, path[1], exitInner, { u: exit.u, v: exit.v }]);
 }
 
 export function buildZigzag(ctx: BuildContext): SegmentPlan {
@@ -474,6 +486,7 @@ export function buildZigzag(ctx: BuildContext): SegmentPlan {
 
   let side = rng.sign();
   const pt = 0.6;
+  const via: { u: number; v: number }[] = [];
   for (let i = 0; i < count; i++) {
     const vc = spacing * (i + 1) + rng.range(-0.6, 0.6);
     const gap = rng.range(1.9, 2.4);
@@ -482,13 +495,14 @@ export function buildZigzag(ctx: BuildContext): SegmentPlan {
     b.solid(side < 0 ? -hw : tipU, side < 0 ? tipU : hw, vc - pt / 2, vc + pt / 2, 0, b.height, 'wall');
     const behindV = vc + pt / 2 + 0.45;
     const openingU = side < 0 ? hw - gap / 2 : -hw + gap / 2;
+    via.push({ u: openingU, v: vc - 1.1 }, { u: openingU, v: vc + 1.1 });
     b.spot(tipU + side * 0.45, behindV, openingU, behindV, 'tight');
     b.spot(side * (hw - 0.45), behindV, openingU, behindV - 0.15, 'deep', rng.chance(0.25) ? 'crouch' : 'stand');
     side = -side as -1 | 1;
   }
   sideWalls(b, hw, end, turn, length, gaps);
   addFarSpots(b, hw, length, exit);
-  return b.build('zigzag', entryWidth, exit);
+  return b.build('zigzag', entryWidth, exit, walkPath(exit, length, via));
 }
 
 export function buildPillarHall(ctx: BuildContext): SegmentPlan {
@@ -521,7 +535,7 @@ export function buildPillarHall(ctx: BuildContext): SegmentPlan {
   }
   sideWalls(b, hw, end, turn, length, gaps);
   addFarSpots(b, hw, length, exit);
-  return b.build('pillars', entryWidth, exit);
+  return b.build('pillars', entryWidth, exit, walkPath(exit, length));
 }
 
 export const BUILDERS: Record<Exclude<SegmentKind, 'spawn'>, (ctx: BuildContext) => SegmentPlan> = {

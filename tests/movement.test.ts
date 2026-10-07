@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { MOVEMENT } from '../src/config/agent';
+import { AGENT, MOVEMENT } from '../src/config/agent';
+import { CollisionWorld } from '../src/physics/world';
+import { Player } from '../src/player/player';
 import { airStep, groundStep, type Vec2, wishDirection } from '../src/player/movement';
 
 const TICK = 1 / 128;
@@ -72,5 +74,37 @@ describe('movement (UE CharacterMovement model)', () => {
     const diag = wishDirection(1, 1, 0)!;
     expect(Math.hypot(diag.x, diag.z)).toBeCloseTo(1);
     expect(wishDirection(0, 0, 1)).toBeNull();
+  });
+});
+
+describe('player stance', () => {
+  const floor = () => {
+    const w = new CollisionWorld();
+    w.addGroup(0, [{ minX: -20, maxX: 20, minY: -0.5, maxY: 0, minZ: -20, maxZ: 20, kind: 'floor' }]);
+    return w;
+  };
+  const idle = { forward: 0, right: 0, walk: false, jump: false };
+
+  it('keeps a steady eye height while standing (no crouch flicker between ticks)', () => {
+    const w = floor();
+    const p = new Player('heavy');
+    p.reset(0, 0, 0, 'heavy');
+    for (let i = 0; i < 64; i++) {
+      p.step(TICK, { ...idle, crouch: false }, 6.75, w, 3.4);
+      expect(p.eyeHeight()).toBe(AGENT.eyeStand);
+    }
+  });
+
+  it('crouches and stands back up in crouchTime', () => {
+    const w = floor();
+    const p = new Player('heavy');
+    p.reset(0, 0, 0, 'heavy');
+    const ticks = Math.ceil(AGENT.crouchTime / TICK);
+    for (let i = 0; i < ticks; i++) p.step(TICK, { ...idle, crouch: true }, 6.75, w, 3.4);
+    expect(p.eyeHeight()).toBeCloseTo(AGENT.eyeCrouch, 6);
+    for (let i = 0; i < 16; i++) p.step(TICK, { ...idle, crouch: true }, 6.75, w, 3.4);
+    expect(p.eyeHeight()).toBeCloseTo(AGENT.eyeCrouch, 6);
+    for (let i = 0; i < ticks; i++) p.step(TICK, { ...idle, crouch: false }, 6.75, w, 3.4);
+    expect(p.eyeHeight()).toBe(AGENT.eyeStand);
   });
 });

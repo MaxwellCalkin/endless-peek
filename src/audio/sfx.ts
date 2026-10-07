@@ -213,6 +213,42 @@ export class Sfx {
     this.noiseBurst(dest, this.ctx.currentTime, 0.08, 'bandpass', 3200, 1.2, 0.18);
   }
 
+  /** Balisong latch/handle click: a bright metallic tick with a short ring. */
+  balisongClick(): void {
+    const dest = this.out();
+    if (!dest || !this.ctx) return;
+    const t = this.ctx.currentTime;
+    this.noiseBurst(dest, t, 0.018, 'bandpass', 4200 + Math.random() * 900, 4, 0.32);
+    this.tone(dest, t, 0.05, 'triangle', 3100 + Math.random() * 300, 2900, 0.06);
+  }
+
+  /** Knife slash: a filtered whoosh that sweeps up, plus a faint shimmer for glowing blades. */
+  swing(heavy: boolean, glowing: boolean): void {
+    const ctx = this.ctx;
+    const dest = this.out();
+    if (!dest || !ctx || !this.noise) return;
+    const t = ctx.currentTime;
+    const dur = heavy ? 0.26 : 0.18;
+    const src = ctx.createBufferSource();
+    src.buffer = this.noise;
+    const f = ctx.createBiquadFilter();
+    f.type = 'bandpass';
+    f.Q.value = 1.4;
+    f.frequency.setValueAtTime(500, t);
+    f.frequency.exponentialRampToValueAtTime(heavy ? 1800 : 2600, t + dur * 0.7);
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(heavy ? 0.5 : 0.38, t + dur * 0.45);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    src.connect(f).connect(g).connect(dest);
+    src.start(t, Math.random() * 0.5);
+    src.stop(t + dur + 0.02);
+    if (glowing) {
+      this.tone(dest, t + 0.02, dur, 'sine', 880, 1320, 0.035);
+      this.tone(dest, t + 0.02, dur, 'sine', 1320, 1980, 0.02);
+    }
+  }
+
   ui(): void {
     const dest = this.out();
     if (!dest || !this.ctx) return;

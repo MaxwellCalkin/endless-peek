@@ -48,6 +48,8 @@ export interface Segment {
   bots: WorldSpot[];
   exitFrame: Frame;
   exitWidth: number;
+  /** World-space walking line from the entry to the exit. */
+  path: { x: number; z: number }[];
   /** Box that closes this segment's entry once the segment behind it is unloaded. */
   seal: WorldBox | null;
   sealed: boolean;
@@ -171,6 +173,7 @@ export function realizeSegment(index: number, kind: SegmentKind, frame: Frame, p
     bots: [],
     exitFrame,
     exitWidth: plan.exit.width,
+    path: plan.path.map((p) => toWorld(frame, p.u, p.v)),
     seal,
     sealed: false,
   };

@@ -16,6 +16,7 @@ export type Action =
   | 'primary'
   | 'secondary'
   | 'melee'
+  | 'inspect'
   | 'restart'
   | 'stats';
 
@@ -33,6 +34,7 @@ export const ACTION_LABELS: Record<Action, string> = {
   primary: 'Primary weapon',
   secondary: 'Secondary weapon',
   melee: 'Knife',
+  inspect: 'Inspect weapon',
   restart: 'Restart run',
   stats: 'Show stats',
 };
@@ -52,11 +54,29 @@ export const DEFAULT_BINDS: Record<Action, string> = {
   primary: 'Digit1',
   secondary: 'Digit2',
   melee: 'Digit3',
+  inspect: 'KeyY',
   restart: 'KeyP',
   stats: 'Tab',
 };
 
 export type Density = 'low' | 'normal' | 'high';
+
+export type KnifeSkin = 'butterfly' | 'tactical';
+export type KnifeGlow = 'cyan' | 'violet' | 'gold' | 'crimson' | 'lime';
+
+/** Glow variants for the butterfly knife: bright core + softer halo. */
+export const KNIFE_GLOWS: Record<KnifeGlow, { label: string; core: string; halo: string }> = {
+  cyan: { label: 'Cyan', core: '#9ffcff', halo: '#2ee6ff' },
+  violet: { label: 'Violet', core: '#e3b8ff', halo: '#a63dff' },
+  gold: { label: 'Gold', core: '#fff1b0', halo: '#ffb21f' },
+  crimson: { label: 'Crimson', core: '#ffc2c8', halo: '#ff2d4b' },
+  lime: { label: 'Lime', core: '#eaffb0', halo: '#7dff2e' },
+};
+
+export const KNIFE_NAMES: Record<KnifeSkin, string> = {
+  butterfly: 'Butterfly Knife',
+  tactical: 'Tactical Knife',
+};
 
 export interface Settings {
   sensitivity: number;
@@ -73,6 +93,8 @@ export interface Settings {
   mode: 'survival' | 'practice';
   primary: WeaponId;
   secondary: WeaponId;
+  knifeSkin: KnifeSkin;
+  knifeGlow: KnifeGlow;
   difficulty: Difficulty;
   botsShoot: boolean;
   botArmor: ArmorKind;
@@ -107,6 +129,8 @@ export const DEFAULT_SETTINGS: Settings = {
   mode: 'survival',
   primary: 'vandal',
   secondary: 'classic',
+  knifeSkin: 'butterfly',
+  knifeGlow: 'cyan',
   difficulty: 'hard',
   botsShoot: true,
   botArmor: 'heavy',

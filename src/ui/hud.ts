@@ -45,6 +45,7 @@ export class Hud {
   private toastTimer = 0;
   private vignetteLevel = 0;
   private indicators: { el: HTMLElement; life: number; yaw: number }[] = [];
+  private feedRows: { el: HTMLElement; age: number }[] = [];
   /** Last values written, so per-frame updates only touch the DOM when something changed. */
   private cache = new Map<string, string>();
 
@@ -110,12 +111,12 @@ export class Hud {
     this.health.parentElement!.classList.toggle('low', health < 40);
   }
 
-  setAmmo(def: WeaponDef, ammo: number, reserve: number, reloadProgress: number | null): void {
-    if (!this.changed('ammo', `${def.id}|${ammo}|${reserve}|${reloadProgress === null ? '' : reloadProgress.toFixed(2)}`)) return;
+  setAmmo(def: WeaponDef, ammo: number, reserve: number, reloadProgress: number | null, name = def.name): void {
+    if (!this.changed('ammo', `${name}|${ammo}|${reserve}|${reloadProgress === null ? '' : reloadProgress.toFixed(2)}`)) return;
     const melee = def.category === 'melee';
     this.ammo.textContent = melee ? '' : String(ammo);
     this.reserve.textContent = melee ? '' : String(reserve);
-    this.weapon.textContent = def.name.toUpperCase();
+    this.weapon.textContent = name.toUpperCase();
     this.ammo.classList.toggle('low', !melee && ammo <= Math.ceil(def.magazine * 0.2));
     const rb = this.reloadBar.parentElement!;
     rb.style.visibility = reloadProgress === null ? 'hidden' : 'visible';
@@ -156,9 +157,8 @@ export class Hud {
     const row = el('div', 'hud-feed-row', undefined);
     row.innerHTML = `<span class="you">YOU</span><span class="gun">${weapon.toUpperCase()}</span>${headshot ? '<span class="hs" title="Headshot"></span>' : ''}<span class="bot">${label}</span>`;
     this.feed.prepend(row);
-    while (this.feed.children.length > 5) this.feed.lastElementChild!.remove();
-    setTimeout(() => row.classList.add('fade'), 4500);
-    setTimeout(() => row.remove(), 5200);
+    this.feedRows.unshift({ el: row, age: 0 });
+    while (this.feedRows.length > 5) this.feedRows.pop()!.el.remove();
   }
 
   /** Damage arrow pointing toward the shooter. `relYaw` is radians relative to view (0 = ahead). */
@@ -208,6 +208,16 @@ export class Hud {
       this.toastTimer -= dt;
       if (this.toastTimer <= 0) this.toast.classList.remove('show');
     }
+    // Kill feed rows fade after 4.5 s and go at 5.2 s (game time, so pausing holds them).
+    for (let i = this.feedRows.length - 1; i >= 0; i--) {
+      const row = this.feedRows[i];
+      row.age += dt;
+      if (row.age >= 4.5) row.el.classList.add('fade');
+      if (row.age >= 5.2) {
+        row.el.remove();
+        this.feedRows.splice(i, 1);
+      }
+    }
   }
 
   /** Keep damage indicators pointing at the shooter as you turn (turning left by d moves them right by d). */
@@ -218,6 +228,7 @@ export class Hud {
   clear(): void {
     this.cache.clear();
     this.feed.innerHTML = '';
+    this.feedRows = [];
     for (const i of this.indicators) i.el.remove();
     this.indicators = [];
     this.vignetteLevel = 0;

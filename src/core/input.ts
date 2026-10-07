@@ -139,6 +139,14 @@ export class Input {
     this.pressed.clear();
   }
 
+  /** Synthetic key state for the debug autopilot: behaves like a real key down / up. */
+  inject(code: string, down: boolean): void {
+    if (down) {
+      if (!this.down.has(code)) this.pressed.add(code);
+      this.down.add(code);
+    } else this.down.delete(code);
+  }
+
   held(binds: Record<Action, string>, a: Action): boolean {
     return this.isDown(binds[a]);
   }
