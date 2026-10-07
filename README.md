@@ -4,7 +4,7 @@ An endless hallway of held angles. Bots hide in random corners, alcoves, doorway
 
 It runs in the browser. The camera, sensitivity, FOV, movement and weapons use VALORANT's real numbers, so your muscle memory carries over in both directions.
 
-![A bot peeking head-only over a crate](docs/screenshot.jpg)
+![Clearing rooms on Hard: a pre-aimed peek, a trade and a long-angle headshot](docs/gameplay.webp)
 
 ## Play
 
@@ -55,6 +55,8 @@ Riot has never published these, so they're best estimates. Each one is a named c
 - **Bot reaction times.** Riot quotes about 247 ms for average human reaction; the difficulties range from 520 ms (Easy) to 170 ms (Radiant).
 
 ## The hallway
+
+![A bot peeking head-only over a crate](docs/screenshot.jpg)
 
 - Built from procedural segments that never repeat: corridors with alcoves and wall cover, rooms with crates, stacks, pillars and raised platforms, zigzag chicanes, and pillar halls. Exits go straight or turn left or right.
 - Each segment hides 0 to 4 bots, with a density setting. Some rooms are empty, so you can't autopilot.
