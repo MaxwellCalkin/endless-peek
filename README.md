@@ -82,6 +82,8 @@ Riot has never published these, so they're best estimates. Each one is a named c
 
 Press **3** for the knife. The default is a glowing butterfly knife (balisong), with every animation driven by real balisong mechanics: the blade and the safe handle swing around their own pivot pins, and the latch clicks when the handles close.
 
+![The butterfly knife flipping open, then the inspect: an aerial toss and a twirl](docs/butterfly-knife.webp)
+
 - **Draw:** comes out closed and flips open in your hand.
 - **Inspect (Y):** presents the blade, closes it, tosses it into an aerial spin that opens mid-air, twirls it twice around your fingers, then fans it.
 - **Slash (left mouse):** a three-hit combo (forehand, backhand, downward diagonal) with a glowing swing trail.
