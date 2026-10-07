@@ -121,6 +121,8 @@ export interface SegmentPlan {
   exit: ExitPort;
   /** Spawn point for the player (only on the spawn segment). */
   spawn?: { u: number; v: number };
+  /** Collision-free walking line from the entry to the exit port (used by the demo autopilot). */
+  path: { u: number; v: number }[];
 }
 
 export const WALL_T = 0.5;

@@ -5,6 +5,8 @@ import {
   type BestRun,
   DEFAULT_BINDS,
   DEFAULT_SETTINGS,
+  KNIFE_GLOWS,
+  type KnifeGlow,
   type Settings,
   bindLabel,
 } from '../config/settings';
@@ -149,7 +151,7 @@ export class Menus {
         h('li', {}, 'Bots hold random angles: alcoves, door corners, behind cover, high ground. They react like players: a few hundred ms after any part of you shows.'),
         h('li', {}, 'Slice the pie, pre-aim head level, counter-strafe before you shoot. Running is loud: walking keeps them unaware.'),
         h('li', {}, 'Re-peeking an angle you just showed is punished: the bot is pre-aimed and reacts faster.'),
-        h('li', {}, `Move ${bindLabel(b.forward)}${bindLabel(b.left)}${bindLabel(b.back)}${bindLabel(b.right)} · Walk ${bindLabel(b.walk)} · Crouch ${bindLabel(b.crouch)} · Jump ${bindLabel(b.jump)} · Reload ${bindLabel(b.reload)} · Weapons ${bindLabel(b.primary)}/${bindLabel(b.secondary)}/${bindLabel(b.melee)} · Restart ${bindLabel(b.restart)} · Pause Esc`),
+        h('li', {}, `Move ${bindLabel(b.forward)}${bindLabel(b.left)}${bindLabel(b.back)}${bindLabel(b.right)} · Walk ${bindLabel(b.walk)} · Crouch ${bindLabel(b.crouch)} · Jump ${bindLabel(b.jump)} · Reload ${bindLabel(b.reload)} · Weapons ${bindLabel(b.primary)}/${bindLabel(b.secondary)}/${bindLabel(b.melee)} · Inspect ${bindLabel(b.inspect)} · Restart ${bindLabel(b.restart)} · Pause Esc`),
       ),
     );
   }
@@ -290,6 +292,15 @@ export class Menus {
       this.row('Primary', this.select('primary', PRIMARY_IDS.map((id) => [id, `${WEAPONS[id].name}`]))),
       this.row('Secondary', this.select('secondary', SECONDARY_IDS.map((id) => [id, WEAPONS[id].name]))),
       this.row(
+        'Knife',
+        this.select('knifeSkin', [
+          ['butterfly', 'Butterfly knife (glowing)'],
+          ['tactical', 'Tactical knife'],
+        ]),
+        `Inspect with ${bindLabel(this.settings.binds.inspect)}. Skins are cosmetic: knife damage and speed are the same.`,
+      ),
+      this.row('Knife glow', this.select('knifeGlow', (Object.keys(KNIFE_GLOWS) as KnifeGlow[]).map((g) => [g, KNIFE_GLOWS[g].label]))),
+      this.row(
         'Bot difficulty',
         this.select(
           'difficulty',
@@ -324,7 +335,7 @@ export class Menus {
       this.row('Heal between rooms', this.toggle('healBetweenRooms'), 'Full HP, shields and ammo each new room, like a new round.'),
       this.row('Show hitboxes', this.toggle('showHitboxes')),
       this.row('Live stats panel', this.toggle('showStatsPanel')),
-      this.row('Seed', this.seedInput(), 'Blank = random hallway each run. Same seed = same hallway.'),
+      this.row('Seed', this.seedInput(), 'Blank = random hallway each run. Same seed = same hallway and bots.'),
       h('p', { class: 'hint' }, 'Mode, weapons, difficulty, density and shields apply from the next run.'),
     );
   }

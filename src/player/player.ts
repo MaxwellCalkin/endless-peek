@@ -103,7 +103,7 @@ export class Player {
       } else {
         this.crouch = Math.max(0, this.crouch - dt / AGENT.crouchTime);
       }
-    } else {
+    } else if (target > this.crouch) {
       this.crouch = Math.min(1, this.crouch + dt / AGENT.crouchTime);
     }
 

@@ -64,8 +64,9 @@ Riot has never published these, so they're best estimates. Each one is a named c
   - If you show yourself and pull back, the bot stays pre-aimed and reacts faster on your re-peek.
   - **Running is loud.** Footsteps, landings and gunfire alert nearby bots. Shift-walking and crouching are silent.
   - Only bots in the next segment or closer are awake, so you never get picked off down a 60 m sightline you can't play.
-- **Survival:** one life, go as deep as you can. Best run per difficulty is saved. **Practice:** deaths are counted and the run continues.
+- **Survival:** one life, go as deep as you can. Best run per difficulty is saved. **Practice:** deaths are counted and the run continues, with a one-second respawn shield so the same bot can't re-kill you instantly.
 - Each new segment refills HP, shields and ammo by default, like a new round. You can turn that off.
+- **Seeds.** Set a seed on the Gameplay tab to replay the same hallway with the same bots.
 
 ### Stats that matter for peeking
 
@@ -76,6 +77,18 @@ Riot has never published these, so they're best estimates. Each one is a named c
 - **Slowest angle type** across the run.
 
 ![Two bots holding a room](docs/screenshot-room.jpg)
+
+## The butterfly knife
+
+Press **3** for the knife. The default is a glowing butterfly knife (balisong), with every animation driven by real balisong mechanics: the blade and the safe handle swing around their own pivot pins, and the latch clicks when the handles close.
+
+- **Draw:** comes out closed and flips open in your hand.
+- **Inspect (Y):** presents the blade, closes it, tosses it into an aerial spin that opens mid-air, twirls it twice around your fingers, then fans it.
+- **Slash (left mouse):** a three-hit combo (forehand, backhand, downward diagonal) with a glowing swing trail.
+- **Heavy stab (right mouse):** pulls back and drives the point at your crosshair.
+- **Glow:** cyan, violet, gold, crimson or lime, on the Gameplay tab. There's also a plain tactical knife.
+
+Knife skins are cosmetic only. Damage is VALORANT's: 50 per slash and 75 per stab, doubled from behind.
 
 ## Controls (VALORANT defaults, rebindable)
 
@@ -88,6 +101,7 @@ Riot has never published these, so they're best estimates. Each one is a named c
 | Fire / Alt fire, ADS, scope | Left / Right mouse |
 | Reload | R |
 | Primary / Secondary / Knife | 1 / 2 / 3 |
+| Inspect weapon | Y |
 | Show stats | Tab (hold) |
 | Restart run | P |
 | Pause | Esc |
@@ -123,11 +137,12 @@ npm run check      # all of the above
 | `src/weapons/gun.ts` | Fire cadence, heat-based spread, recoil and recovery, ADS and scopes, bursts, reloads |
 | `src/bots/bot.ts` | Perception, reaction, hearing, re-peek memory, burst fire |
 | `src/world/` | The endless hallway: segment builders, joint rules, streaming and sealing |
-| `src/render/` | Three.js level meshes, procedural textures, bot mannequins with outline, viewmodel, effects |
+| `src/render/` | Three.js level meshes, procedural textures, bot mannequins with outline, viewmodel, the butterfly knife and its animation timelines, effects |
 | `src/ui/` | HUD, menus, crosshair renderer and code parser |
+| `src/game/` | The game loop, combat, run stats, and the demo autopilot |
 | `tests/` | Unit tests, including the weapon table checked against `tests/fixtures/weapons-13.06.json` (extracted from the game data) |
 
-`?debug` in the URL exposes `window.__ep`, a small scripting API used by the automated browser checks.
+`?debug` in the URL exposes `window.__ep`, a small scripting API used by the automated browser checks. It includes a demo autopilot (`__ep.autopilot(true)`) that plays like a decent player: it walks the hallway's walking line, shift-walks through openings, pre-aims common angles, counter-strafes and taps heads. With `__ep.freeze(true)` and `__ep.frame(1 / 60)` you can step the game frame by frame and capture a clip at any frame rate.
 
 ## Deploy to GitHub Pages
 

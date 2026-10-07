@@ -136,6 +136,8 @@ export class Bot {
   diedAt = -Infinity;
   /** Last time the bot took damage. */
   hurtAt = -Infinity;
+  /** Last time the bot fired (gunfire gives its position away). */
+  firedAt = -Infinity;
   lastHitRegion: HitRegion | null = null;
 
   private reactAt = 0;
@@ -349,6 +351,7 @@ export class Bot {
   }
 
   private fire(s: BotSenses): BotShot {
+    this.firedAt = s.now;
     const from = this.eye();
     const target = this.aimHead ? s.playerHead : s.playerChest;
     let dx = target.x - from.x;

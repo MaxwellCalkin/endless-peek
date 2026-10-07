@@ -5,6 +5,8 @@ import { AGENT, HITBOXES, applyHit, makeVitals } from '../config/agent';
 import {
   type BestRun,
   ENEMY_HIGHLIGHT,
+  KNIFE_GLOWS,
+  KNIFE_NAMES,
   type Settings,
   loadBest,
   saveBest,
@@ -30,12 +32,15 @@ import { Hud } from '../ui/hud';
 import { Menus } from '../ui/menus';
 import { type Density, Hallway, type Segment } from '../world/hallway';
 import { Gun, type MoveSample, type ShotEvent } from '../weapons/gun';
+import { Autopilot, DEFAULT_PILOT, type PilotHost, type PilotOptions } from './autopilot';
 import { RunStats, TAG_PHRASES } from './stats';
 
 /** VALORANT servers and clients simulate at 128 Hz. */
 const TICK = 1 / 128;
 /** Seconds after spawning before bots start looking, so a run never opens with a spawn kill. */
 const SPAWN_GRACE = 1.5;
+/** Practice mode: seconds after a death before bots may hit you again (no instant re-kills). */
+const PRACTICE_RESPAWN_GRACE = 1;
 const BOT_WEAPON = WEAPONS.vandal;
 const DENSITY: Record<Settings['density'], Density> = {
   low: { min: 0, max: 1, emptyChance: 0.25 },
@@ -103,6 +108,10 @@ export class Game {
   private skyTheme = -1;
   /** Debug/test hook: when set, the real-time loop renders but doesn't advance the simulation. */
   private frozen = false;
+  /** Practice mode: bot shots are held back until this time after a death. */
+  private safeUntil = -Infinity;
+  /** Debug-only scripted player (demo recordings). */
+  private pilot: Autopilot | null = null;
 
   constructor(
     container: HTMLElement,
@@ -118,6 +127,8 @@ export class Game {
     this.renderer.domElement.className = 'game-canvas';
     container.appendChild(this.renderer.domElement);
     this.viewmodel = new Viewmodel(this.renderer);
+    this.viewmodel.setKnife(settings.knifeSkin, KNIFE_GLOWS[settings.knifeGlow]);
+    this.viewmodel.onFlipClick = () => this.sfx.balisongClick();
 
     this.hemi = new THREE.HemisphereLight('#cfe0f5', '#7d7368', 1.35);
     this.scene.add(this.hemi);
@@ -224,10 +235,14 @@ export class Game {
     this.hud.clear();
 
     this.time = 0;
+    this.safeUntil = -Infinity;
     this.acc = 0;
     this.stats.reset(0);
     this.lastKill = { ttk: null, placement: null, tag: null };
-    this.hallway = new Hallway(this.seed(), DENSITY[this.runSettings.density]);
+    const seed = this.seed();
+    this.hallway = new Hallway(seed, DENSITY[this.runSettings.density]);
+    // Bots, spread and recoil draw from their own stream, so a seed replays the whole run.
+    this.rng = new Rng((seed ^ 0x9e3779b9) >>> 0);
     for (const seg of this.hallway.start()) this.addSegment(seg);
     const sp = this.hallway.spawnPoint;
     this.player.reset(sp.x, sp.z, sp.yaw, this.runSettings.playerArmor);
@@ -235,6 +250,7 @@ export class Game {
     this.slot = 'primary';
     this.guns.primary.equip();
     this.viewmodel.setWeapon(this.guns.primary.def);
+    this.viewmodel.onEquip();
     this.walkOn = false;
     this.crouchOn = false;
   }
@@ -368,6 +384,10 @@ export class Game {
           // The WebGL context can't change AA after creation.
           location.reload();
           break;
+        case 'knifeSkin':
+        case 'knifeGlow':
+          this.viewmodel.setKnife(s.knifeSkin, KNIFE_GLOWS[s.knifeGlow]);
+          break;
         case 'enemyHighlight':
           this.outlineMat.uniforms.uColor.value.set(ENEMY_HIGHLIGHT[s.enemyHighlight]);
           break;
@@ -495,9 +515,11 @@ export class Game {
     const nowMs = performance.now();
     const dt = Math.min(0.1, (nowMs - this.lastFrame) / 1000);
     this.lastFrame = nowMs;
+    // Frozen (debug/recording): frames are driven manually through debugApi().frame().
+    if (this.frozen) return;
     if (dt > 0) this.fps = this.fps ? this.fps * 0.92 + (1 / dt) * 0.08 : 1 / dt;
 
-    if (this.state === 'playing' && !this.frozen) {
+    if (this.state === 'playing') {
       this.look();
       this.acc += dt;
       let ticks = 0;
@@ -530,6 +552,11 @@ export class Game {
     this.lookDY = (dy * d) / DEG;
   }
 
+  /** Display name, with the chosen knife skin for the melee slot. */
+  private weaponName(def: WeaponDef): string {
+    return def.category === 'melee' ? KNIFE_NAMES[this.settings.knifeSkin] : def.name;
+  }
+
   private get gun(): Gun {
     return this.guns[this.slot];
   }
@@ -540,6 +567,7 @@ export class Game {
     this.slot = slot;
     this.gun.equip();
     this.viewmodel.setWeapon(this.gun.def);
+    this.viewmodel.onEquip();
     this.sfx.equip();
   }
 
@@ -557,6 +585,7 @@ export class Game {
 
   private tick(dt: number): void {
     this.time += dt;
+    this.pilot?.tick(dt);
     const b = this.settings.binds;
     const inp = this.input;
     const p = this.player;
@@ -564,6 +593,7 @@ export class Game {
     if (inp.press(b, 'primary')) this.switchTo('primary');
     if (inp.press(b, 'secondary')) this.switchTo('secondary');
     if (inp.press(b, 'melee')) this.switchTo('melee');
+    if (inp.press(b, 'inspect') && this.gun.state === 'ready') this.viewmodel.inspect();
 
     if (this.settings.walkToggle && inp.press(b, 'walk')) this.walkOn = !this.walkOn;
     if (this.settings.crouchToggle && inp.press(b, 'crouch')) this.crouchOn = !this.crouchOn;
@@ -646,8 +676,8 @@ export class Game {
     const base = viewDir(viewYaw, viewPitch);
 
     if (shot.kind === 'melee') {
-      this.viewmodel.onSwing();
-      this.sfx.gunshot(def);
+      this.viewmodel.onSwing(shot.heavy ?? false);
+      this.sfx.swing(shot.heavy ?? false, this.settings.knifeSkin === 'butterfly');
       this.meleeHit(eye, base, shot.heavy ?? false);
       return;
     }
@@ -751,7 +781,7 @@ export class Game {
       distance: Math.hypot(point.x - eye.x, point.y - eye.y, point.z - eye.z),
     });
     this.lastKill = { ttk, placement: bot.placementError, tag: bot.tag };
-    this.hud.killFeed(def.name, headshot, 'BOT');
+    this.hud.killFeed(this.weaponName(def), headshot, 'BOT');
     this.hud.flashKillBanner(headshot ? 'HEADSHOT' : 'ELIMINATED', headshot);
     this.sfx.kill(headshot);
     const v = this.views.get(bot.id);
@@ -784,7 +814,7 @@ export class Game {
       // dormant so you never get picked off down a 60 m sightline you can't play.
       if (bot.segment > near + 1 || bot.segment < near - 1) continue;
       const shots = bot.update(dt, senses);
-      if (this.runSettings.botsShoot) for (const s of shots) this.botShot(bot, s);
+      if (this.runSettings.botsShoot && this.time >= this.safeUntil) for (const s of shots) this.botShot(bot, s);
     }
   }
 
@@ -850,6 +880,7 @@ export class Game {
     }
     // Practice: count it and keep going.
     this.player.vitals = makeVitals(this.runSettings.playerArmor);
+    this.safeUntil = this.time + PRACTICE_RESPAWN_GRACE;
     this.hud.showToast(`DEAD · killed from ${TAG_PHRASES[bot.tag]} · it reacted in ${Math.round(bot.reactionUsed * 1000)} ms`, 2.4);
   }
 
@@ -983,7 +1014,7 @@ export class Game {
     const gun = this.gun;
     const s = this.settings;
     this.hud.setVitals(p.vitals.health, p.vitals.shield);
-    this.hud.setAmmo(gun.def, gun.ammo, gun.reserve, gun.state === 'reloading' ? gun.stateProgress : null);
+    this.hud.setAmmo(gun.def, gun.ammo, gun.reserve, gun.state === 'reloading' ? gun.stateProgress : null, this.weaponName(gun.def));
     this.hud.setTop(this.time, this.hallway!.current, this.stats.kills);
     this.hud.setFps(s.showFps ? this.fps : null);
     const showStats = s.showStatsPanel || this.input.held(s.binds, 'stats');
@@ -1003,12 +1034,71 @@ export class Game {
     this.crosshair.draw(profile, errorToPixels(err.base, heightPx, zoom), errorToPixels(err.firing, heightPx, zoom), errorToPixels(err.movement, heightPx, zoom));
   }
 
+  private pilotHost(): PilotHost {
+    const game = this;
+    const p = this.player;
+    return {
+      get time() {
+        return game.time;
+      },
+      get binds() {
+        return game.settings.binds;
+      },
+      eye: () => this.eye(),
+      // The pilot aims the crosshair, which rides the camera recoil like a player's would.
+      view: () => ({ yaw: p.yaw - this.gun.recoilYaw * DEG, pitch: p.pitch + this.gun.recoilPitch * DEG }),
+      setView: (yaw, pitch) => {
+        const ny = yaw + this.gun.recoilYaw * DEG;
+        const np = clamp(pitch - this.gun.recoilPitch * DEG, -89 * DEG, 89 * DEG);
+        const dYaw = angleDelta(p.yaw, ny);
+        this.hud.rotateIndicators(dYaw);
+        this.lookDX -= dYaw / DEG;
+        this.lookDY -= (np - p.pitch) / DEG;
+        p.yaw = ny;
+        p.pitch = np;
+      },
+      speed: () => p.speed,
+      velocity: () => ({ x: p.vel.x, z: p.vel.z }),
+      bots: () => this.bots,
+      currentSegment: () => this.hallway!.current,
+      clear: (a, b) => !this.world.segmentBlocked(a.x, a.y, a.z, b.x, b.y, b.z),
+      waypoints: () => this.hallway!.segments.flatMap((s) => s.path.map((w, i) => ({ seg: s.index, i, x: w.x, z: w.z }))),
+      angles: () => {
+        const cur = this.hallway!.current;
+        return this.hallway!.segments
+          .filter((s) => s.index >= cur && s.index <= cur + 1)
+          .flatMap((s) => s.spots.map((sp, i) => ({ key: `${s.index}:${i}`, x: sp.x, y: sp.y + HITBOXES[sp.stance].head.y, z: sp.z })));
+      },
+      key: (code, down) => this.input.inject(code, down),
+      weapon: () => ({
+        melee: this.gun.isMelee,
+        ready: this.gun.state === 'ready',
+        deadzone: this.gun.def.deadzone * this.gun.def.runSpeed,
+      }),
+    };
+  }
+
   // ---------------------------------------------------------------- debug hooks (used by automated tests)
 
   debugApi(): Record<string, unknown> {
     return {
       freeze: (on: boolean) => {
         this.frozen = on;
+        this.lastFrame = performance.now();
+      },
+      /** Advance one rendered frame of `dt` seconds (simulation at 128 Hz underneath). */
+      frame: (dt: number, draw = true) => {
+        if (this.state === 'playing') {
+          this.acc += dt;
+          let n = 0;
+          while (this.acc >= TICK && n < 32) {
+            this.tick(TICK);
+            this.acc -= TICK;
+            n++;
+            if (this.state !== 'playing') break;
+          }
+        }
+        if (draw) this.render(dt);
       },
       start: () => {
         this.newRun();
@@ -1039,12 +1129,10 @@ export class Game {
         this.player.pitch = Math.atan2(y - e.y, Math.hypot(x - e.x, z - e.z));
       },
       press: (code: string, seconds: number) => {
-        const inp = this.input as unknown as { down: Set<string>; pressed: Set<string> };
-        inp.down.add(code);
-        inp.pressed.add(code);
+        this.input.inject(code, true);
         const n = Math.round(seconds / TICK);
         for (let i = 0; i < n && this.state === 'playing'; i++) this.tick(TICK);
-        inp.down.delete(code);
+        this.input.inject(code, false);
       },
       botYaw: (i: number) => this.bots[i]?.yaw ?? 0,
       probe: (i: number) => {
@@ -1056,15 +1144,20 @@ export class Game {
         const los = p.visibilityPoints().map((pt) => !this.world.segmentBlocked(eye.x, eye.y, eye.z, pt.x, pt.y, pt.z));
         return { inside, los, state: bot.state, time: this.time, current: this.hallway!.current, botSeg: bot.segment };
       },
-      hold: (code: string, down: boolean) => {
-        const inp = this.input as unknown as { down: Set<string>; pressed: Set<string> };
-        if (down) {
-          inp.down.add(code);
-          inp.pressed.add(code);
-        } else inp.down.delete(code);
-      },
-      stats: () => ({ kills: this.stats.kills, shots: this.stats.shots, hits: this.stats.hits, rooms: this.stats.rooms, state: this.state }),
+      hold: (code: string, down: boolean) => this.input.inject(code, down),
+      stats: () => ({ kills: this.stats.kills, deaths: this.stats.deaths, shots: this.stats.shots, hits: this.stats.hits, rooms: this.stats.rooms, state: this.state }),
       state: () => this.state,
+      /** Let the demo autopilot play (on) or hand control back (off). */
+      autopilot: (on: boolean, opts: Partial<PilotOptions> = {}) => {
+        this.pilot?.release();
+        this.pilot = on ? new Autopilot(this.pilotHost(), { ...DEFAULT_PILOT, ...opts }) : null;
+      },
+      pilotState: () => this.pilot?.debugState() ?? null,
+      lastDeath: () => this.stats.death,
+      paths: () => this.hallway!.segments.map((s) => ({ index: s.index, kind: s.kind, path: s.path })),
+      /** Switch weapon slot like the 1/2/3 keys. */
+      slot: (slot: Slot) => this.switchTo(slot),
+      inspect: () => this.viewmodel.inspect(),
     };
   }
 }

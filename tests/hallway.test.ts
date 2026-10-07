@@ -126,6 +126,30 @@ describe('endless hallway', () => {
     }
   });
 
+  it('walk paths run from the entry to the exit port without clipping cover', () => {
+    const r = 0.34;
+    for (const seed of [21, 22, 23, 24, 25, 26]) {
+      for (const s of walkSegments(seed, 40)) {
+        const { path, boxes, exit } = s.plan;
+        const last = path[path.length - 1];
+        expect(last.u).toBeCloseTo(exit.u);
+        expect(last.v).toBeCloseTo(exit.v);
+        const blockers = boxes.filter((b) => b.y0 < 1.5 && b.y1 > 0.05);
+        for (let i = 0; i + 1 < path.length; i++) {
+          const a = path[i];
+          const b = path[i + 1];
+          const steps = Math.max(1, Math.ceil(Math.hypot(b.u - a.u, b.v - a.v) / 0.1));
+          for (let k = 0; k <= steps; k++) {
+            const u = a.u + ((b.u - a.u) * k) / steps;
+            const v = a.v + ((b.v - a.v) * k) / steps;
+            const hit = blockers.find((x) => u + r > x.u0 && u - r < x.u1 && v + r > x.v0 && v - r < x.v1);
+            expect(hit, `seed ${seed} segment ${s.index} (${s.kind}) at ${u.toFixed(2)},${v.toFixed(2)}`).toBeUndefined();
+          }
+        }
+      }
+    }
+  });
+
   it('gives most segments at least one hiding spot and spreads bots apart', () => {
     const segs = walkSegments(99, 80).filter((s) => s.kind !== 'spawn');
     const withSpots = segs.filter((s) => s.spots.length > 0).length;
